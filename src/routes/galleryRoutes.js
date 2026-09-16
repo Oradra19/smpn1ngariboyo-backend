@@ -6,7 +6,7 @@ import {
   deleteGallery
 } from '../controllers/galleryController.js'
 import { authenticateToken } from '../middlewares/authMiddleware.js'
-import { upload } from '../middlewares/uploadMiddleware.js'
+import { uploadSingle } from '../middlewares/uploadMiddleware.js'
 
 const router = express.Router()
 
@@ -14,8 +14,8 @@ const router = express.Router()
 router.get('/', getAllGalleries)
 
 // Endpoint admin (butuh token & upload foto)
-router.post('/', authenticateToken, upload.single('image'), createGallery)
-router.put('/:id', authenticateToken, upload.single('image'), updateGallery)
+router.post('/', authenticateToken, uploadSingle('image'), createGallery)
+router.put('/:id', authenticateToken, uploadSingle('image'), updateGallery)
 router.delete('/:id', authenticateToken, deleteGallery)
 
 export default router

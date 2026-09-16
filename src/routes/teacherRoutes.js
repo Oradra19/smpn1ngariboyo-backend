@@ -7,14 +7,14 @@ import {
   deleteTeacher
 } from '../controllers/teacherController.js'
 import { authenticateToken } from '../middlewares/authMiddleware.js'
-import { upload } from '../middlewares/uploadMiddleware.js'
+import { uploadSingle } from '../middlewares/uploadMiddleware.js'
 
 const router = express.Router()
 
 router.get('/', getAllTeachers)
 router.get('/:id', getTeacherById)
-router.post('/', authenticateToken, upload.single('photo'), createTeacher)
-router.put('/:id', authenticateToken, upload.single('photo'), updateTeacher)
+router.post('/', authenticateToken, uploadSingle('photo'), createTeacher)
+router.put('/:id', authenticateToken, uploadSingle('photo'), updateTeacher)
 router.delete('/:id', authenticateToken, deleteTeacher)
 
 export default router

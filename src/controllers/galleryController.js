@@ -61,9 +61,10 @@ export const createGallery = async (req, res) => {
           category,
           \`desc\`,
           date,
-          image
+          image,
+          updatedAt
         )
-        VALUES (?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, NOW(3))
       `,
       [
         title,
@@ -131,19 +132,15 @@ export const updateGallery = async (req, res) => {
     }
 
     let image = existing.image
+    let oldPath
 
     // Jika ada gambar baru
     if (req.file) {
-      // Hapus file lama
       if (existing.image) {
-        const oldPath = path.join(
+        oldPath = path.join(
           process.cwd(),
           existing.image.replace(/^\/+/, '')
         )
-
-        if (fs.existsSync(oldPath)) {
-          fs.unlinkSync(oldPath)
-        }
       }
 
       image = `/uploads/${req.file.filename}`
@@ -157,7 +154,8 @@ export const updateGallery = async (req, res) => {
           title = ?,
           category = ?,
           \`desc\` = ?,
-          image = ?
+          image = ?,
+          updatedAt = NOW(3)
         WHERE id = ?
       `,
       [
@@ -168,6 +166,14 @@ export const updateGallery = async (req, res) => {
         id
       ]
     )
+
+    if (oldPath && fs.existsSync(oldPath)) {
+      try {
+        fs.unlinkSync(oldPath)
+      } catch (error) {
+        console.warn('Gagal menghapus gambar galeri lama:', error.message)
+      }
+    }
 
     // Ambil data setelah update
     const [updatedRows] = await db.query(

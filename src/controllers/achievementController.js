@@ -55,9 +55,10 @@ export const createAchievement = async (req, res) => {
           medalLabel,
           student,
           organizer,
-          \`desc\`
+          \`desc\`,
+          updatedAt
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(3))
       `,
       [
         title,

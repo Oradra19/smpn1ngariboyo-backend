@@ -11,13 +11,26 @@ import { upload } from '../middlewares/uploadMiddleware.js'
 
 const router = express.Router()
 
+const uploadNewsImage = (req, res, next) => {
+  upload.single('image')(req, res, (error) => {
+    if (error) {
+      return res.status(400).json({
+        success: false,
+        message: error.message
+      })
+    }
+
+    next()
+  })
+}
+
 // Endpoint publik
 router.get('/', getAllNews)
 router.get('/:id', getNewsById)
 
 // Endpoint khusus Admin (wajib login & bawa token)
-router.post('/', authenticateToken, upload.single('image'), createNews)
-router.put('/:id', authenticateToken, upload.single('image'), updateNews)
+router.post('/', authenticateToken, uploadNewsImage, createNews)
+router.put('/:id', authenticateToken, uploadNewsImage, updateNews)
 router.delete('/:id', authenticateToken, deleteNews)
 
 export default router

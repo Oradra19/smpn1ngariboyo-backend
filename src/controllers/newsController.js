@@ -114,9 +114,10 @@ export const createNews = async (req, res) => {
           categoryColor,
           author,
           content,
-          image
+          image,
+          updatedAt
         )
-        VALUES (?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, NOW(3))
       `,
       [
         title,
@@ -199,6 +200,7 @@ export const updateNews = async (req, res) => {
 
     // Pertahankan gambar lama
     let imagePath = existingNews.image
+    let oldFilePath
 
     // Jika upload gambar baru
     if (req.file) {
@@ -209,14 +211,10 @@ export const updateNews = async (req, res) => {
         existingNews.image &&
         existingNews.image.startsWith('/uploads/')
       ) {
-        const oldFilePath = path.join(
+        oldFilePath = path.join(
           process.cwd(),
           existingNews.image.replace(/^\/+/, '')
         )
-
-        if (fs.existsSync(oldFilePath)) {
-          fs.unlinkSync(oldFilePath)
-        }
       }
     }
 
@@ -230,7 +228,8 @@ export const updateNews = async (req, res) => {
           categoryColor = ?,
           author = ?,
           content = ?,
-          image = ?
+          image = ?,
+          updatedAt = NOW(3)
         WHERE id = ?
       `,
       [
@@ -243,6 +242,15 @@ export const updateNews = async (req, res) => {
         id
       ]
     )
+
+    // Hapus gambar lama setelah database berhasil diperbarui.
+    if (oldFilePath && fs.existsSync(oldFilePath)) {
+      try {
+        fs.unlinkSync(oldFilePath)
+      } catch (error) {
+        console.warn('Gagal menghapus gambar lama:', error.message)
+      }
+    }
 
     // Ambil data terbaru
     const [updatedRows] = await db.query(

@@ -111,9 +111,10 @@ export const createTeacher = async (req, res) => {
           category,
           nip,
           subject,
-          photo
+          photo,
+          updatedAt
         )
-        VALUES (?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, NOW(3))
       `,
       [
         name,
@@ -196,6 +197,7 @@ export const updateTeacher = async (req, res) => {
 
     // Pertahankan foto lama
     let photoPath = existing.photo
+    let oldPath
 
     // Jika upload foto baru
     if (req.file) {
@@ -206,14 +208,10 @@ export const updateTeacher = async (req, res) => {
         existing.photo &&
         existing.photo.startsWith('/uploads/')
       ) {
-        const oldPath = path.join(
+        oldPath = path.join(
           process.cwd(),
           existing.photo.replace(/^\/+/, '')
         )
-
-        if (fs.existsSync(oldPath)) {
-          fs.unlinkSync(oldPath)
-        }
       }
     }
 
@@ -227,7 +225,8 @@ export const updateTeacher = async (req, res) => {
           category = ?,
           nip = ?,
           subject = ?,
-          photo = ?
+          photo = ?,
+          updatedAt = NOW(3)
         WHERE id = ?
       `,
       [
@@ -240,6 +239,14 @@ export const updateTeacher = async (req, res) => {
         id
       ]
     )
+
+    if (oldPath && fs.existsSync(oldPath)) {
+      try {
+        fs.unlinkSync(oldPath)
+      } catch (error) {
+        console.warn('Gagal menghapus foto lama:', error.message)
+      }
+    }
 
     // Ambil data terbaru
     const [updatedRows] = await db.query(
