@@ -86,14 +86,13 @@ export const createTeacher = async (req, res) => {
       name,
       role,
       category,
-      nip,
       subject
     } = req.body
 
-    if (!name || !nip || !category) {
+    if (!name || !category) {
       return res.status(400).json({
         success: false,
-        message: 'Nama, NIP, dan kategori wajib diisi.'
+        message: 'Nama dan kategori wajib diisi.'
       })
     }
 
@@ -109,18 +108,16 @@ export const createTeacher = async (req, res) => {
           name,
           role,
           category,
-          nip,
           subject,
           photo,
           updatedAt
         )
-        VALUES (?, ?, ?, ?, ?, ?, NOW(3))
+        VALUES (?, ?, ?, ?, ?, NOW(3))
       `,
       [
         name,
         role || 'Guru Mata Pelajaran',
         category,
-        nip,
         subject || '-',
         photoPath
       ]
@@ -171,7 +168,6 @@ export const updateTeacher = async (req, res) => {
       name,
       role,
       category,
-      nip,
       subject
     } = req.body
 
@@ -223,7 +219,6 @@ export const updateTeacher = async (req, res) => {
           name = ?,
           role = ?,
           category = ?,
-          nip = ?,
           subject = ?,
           photo = ?,
           updatedAt = NOW(3)
@@ -233,7 +228,6 @@ export const updateTeacher = async (req, res) => {
         name ?? existing.name,
         role ?? existing.role,
         category ?? existing.category,
-        nip ?? existing.nip,
         subject ?? existing.subject,
         photoPath,
         id
